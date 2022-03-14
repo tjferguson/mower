@@ -43,21 +43,26 @@ void setup() {
  * 3 --> Rudder  (left stick left/right)
  * 4 --> Switch (SA)  190 == off; 992 == mid; 1720 == 100%
  * 5 --> Switch (SB)  190 == off; 992 == mid; 1720 == 100%
- *
+ * 6 --> Switch (SC)  190 == off; 992 == mid; 1720 == 100%
+ * 7 --> Switch (SD)  190 == off; 992 == mid; 1720 == 100%
  * 8 --> Signal Strength --> < 1000 disconnected; >= 1001 connected at various levels
  */
 bool REMOTE_CONNECTED = false;
 float steering = 50.0;
 
 void loop() {
-    digitalWrite(LED_BUILTIN, HIGH);
-
     if (sbus_rx.Read()) {
         sbus_data = sbus_rx.ch();
         REMOTE_CONNECTED = validateRemoteConnection(sbus_data[REMOTE_CONNECTION_CHANNEL], REMOTE_CONNECTED);
 
-        
-
+        for (int8_t i = 0; i <= 8; i++) {
+            mySerial.print("Channel");
+            mySerial.print(i);
+            mySerial.print(":");
+            mySerial.print(sbus_data[i]);
+            mySerial.print("\t");
+        }
+        mySerial.print("\n");
     }
 }
 
