@@ -1,4 +1,4 @@
-#General Information
+# General Information
 
 
 Use of SoftwareSerial is absolutely required, this should be ran through something like a CP2102 UART dongle
@@ -15,7 +15,7 @@ Setup CLI Tools (tried using export of path, but that failed for some reason ins
 
 
 
-##Parts List
+## Parts List
 
 ### Pre-Built
 * Arduino Uno
