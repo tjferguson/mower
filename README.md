@@ -1,10 +1,10 @@
-#General Information
+# General Information
 
 The purpose of this project is to turn a bunch of ardiuno + FPV electronics into a fully functional FPV lawn mower capable of handling my side lawn; this particular lawn happens to have between a 15 and 30% grade in different areas, and as evidenced by the missing tip of my right grand toe, is fairly dangerous to mow.   
 
 
 
-##Parts List
+## Parts List
 
 ### Pre-Built
 * Arduino Uno
