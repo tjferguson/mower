@@ -20,11 +20,14 @@
 #define TRACE2(x)
 #endif
 
-
-
 SoftwareSerial mySerial(2, 3); // RX, TX
 
 #define REMOTE_CONNECTION_CHANNEL 8
+#define SWITCH_ON 1720
+#define SWITCH_MID 990
+#define SWITCH_OFF 190
+#define SWITCH_JITTER 20
+
 
 //Receive channel for the sbus data
 bfs::SbusRx sbus_rx(&Serial);
@@ -63,7 +66,13 @@ void setup() {
 }
 
 /**
- * We care about 9 channels for our R81 they are as follows (mapped from remote):
+ * We care about 9 channels for our R81 they are as follows (mapped from my remote):
+ * These were assigned in the DEFINES above as:
+ * SWITCH_ON ==> 1720
+ * SWITCH_MID ==> 990
+ * SWITCH_OFF ==> 190
+ * SWITCH_JITTER ==> 20
+ *
  * 0 --> Ail (right stick Left/Right)
  * 1 --> Elevation (right stick up/down)
  * 2 --> Throttle (left stick up/down)
@@ -128,12 +137,12 @@ void loop() {
 boolean validateRemoteConnection(int signalStrength, boolean remoteConnected) {
     //mySerial.println(signalStrength);
     //Connected and still connected; nothing to see here
-    if(remoteConnected && signalStrength > 1000) return true;
+    if(remoteConnected && signalStrength > (SWITCH_MID+SWITCH_JITTER) ) return true;
 
-    if(!remoteConnected && signalStrength > 1000) {
+    if(!remoteConnected && signalStrength > (SWITCH_MID+SWITCH_JITTER) ) {
         LOG("Remote is reconnected");
         return true;
-    } else if(remoteConnected && signalStrength <= 1000) {
+    } else if(remoteConnected && signalStrength <= (SWITCH_MID+SWITCH_JITTER)) {
         LOG("Remote disconnected");
         return false;
     }
@@ -153,21 +162,21 @@ boolean validateRemoteConnection(int signalStrength, boolean remoteConnected) {
  */
 int sbusValueToPercent(int sbusValue) {
     //Give ourselves a few degrees on the stick of 'zero' space, since we don't want the mower to jump when we start it up.
-    if(sbusValue > 950 && sbusValue < 1050) {
+    if(sbusValue > (SWITCH_MID-SWITCH_JITTER) && sbusValue < (SWITCH_MID+SWITCH_JITTER)) {
         return 0;
     }
-    if(sbusValue < 210) return -100;
-    if(sbusValue > 1700) return 100;
+    if(sbusValue < (SWITCH_OFF+SWITCH_JITTER)) return -100;
+    if(sbusValue > (SWITCH_ON-SWITCH_JITTER)) return 100;
 
-    if(sbusValue <= 990) {
+    if(sbusValue <= SWITCH_MID) {
         //Calculate as a whole % of the delta of the range 990-190  (800 values)
-        int ret = (int)( (100 - ((sbusValue - 190)/8.2f))*-1);
+        int ret = (int)( (100 - ((sbusValue - SWITCH_OFF)/8.2f))*-1);
         if(ret > 0) return 0;
         if(ret < -90) return -100;
         return ret;
     }
-    if(sbusValue >= 1000) {
-        int ret = (int)((sbusValue - 1000)/7.2f);
+    if(sbusValue >= SWITCH_MID) {
+        int ret = (int)((sbusValue - SWITCH_MID)/7.2f);
         if(ret > 100) return 100;
         if(ret < 0) return 0;
 
